@@ -1,14 +1,12 @@
----
-title:  nachos4.1 installation guide on artix linux
-author: minjiphobia
-date:   Oct 23, 2020
----
+
+[//]:# (author: minjiphobia\ date: Oct 23, 2020)
+
 # nachos4.1 installation guide on artix linux
 While there are plenty of tutorials on how to install [nachos](https://en.wikipedia.org/wiki/Not_Another_Completely_Heuristic_Operating_System) on ubuntu, which is the most used linux distro for educational purpose in china. It's hard to retrieve such infos for other distros like artix which I'm currently using. Therefore, I'd like to share what I've encountered during the installation of nachos on artix linux and how I make it work.
 
 **NOTE**: There's no systemd-related changes in following procedure, so i suppose this guide works well on archlinux and manjaro too.
 
-### Download the sources of nachos4.1  
+## Download the sources of nachos4.1  
 > `wget https://www.u-aizu.ac.jp/~yliu/teaching/os/NachOS-4.1a.tar.gz`  
 `tar xvf NachOS-4.1a.tar.gz` 
 
@@ -16,7 +14,7 @@ I rename the package to 'nachos' for simplicity. It's optional. Remember to repl
 > `mv NachOS-4.1a nachos`  
 
 
-### Install 32bit runtime libs and gcc-multilib
+## Install 32bit runtime libs and gcc-multilib
 
 The build of nachos requires 32bit runtime libraries and old gcc version which is as well capable of compiling 32bit program.  
 
@@ -37,7 +35,7 @@ make a directory for your manually built package and cd into it. type:
 if you have one of the aur-helpers installed, taking yay for instance, you can simply type:
 > `yay -S gcc49-multilib`  
 
-### Modify sysdep.h and Makefile 
+## Modify sysdep.h and Makefile 
 
 Assuming you're in nachos directory, edit code/lib/sysdep.h, replacing *include \<iostream.h\>* with *include \<iostream\>* at line 15 and add *using namespace std;* at line 19. You can simply copy-paste this command:
 > `sed -i '15s/.*/include <iostream>/' code/lib/sysdep.h && sed -i '19iusing namespace std;' code/lib/sysdep.h`  
