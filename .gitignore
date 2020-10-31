@@ -1,2 +1,3 @@
 *.o
 code/build.linux/nachos
+*/DISK_0
