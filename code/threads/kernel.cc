@@ -26,10 +26,13 @@
 
 Kernel::Kernel(int argc, char **argv)
 {
+    maxThreadNum = 128;
     randomSlice = FALSE; 
     debugUserProg = FALSE;
-    consoleIn = NULL;          // default is stdin
-    consoleOut = NULL;         // default is stdout
+    consoleIn = NULL;           // default is stdin
+    consoleOut = NULL;          // default is stdout
+    threadList = NULL;          // default threadList is empty
+    threadPool = NULL;          // 
 #ifndef FILESYS_STUB
     formatFlag = FALSE;
 #endif
@@ -90,6 +93,9 @@ Kernel::Initialize()
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
+    threadNum = 0;
+    threadList = new List<Thread*>; // threadList shoube init before main thread is created
+    threadPool = new bool[maxThreadNum]{false};
     currentThread = new Thread("main");		
     currentThread->setStatus(RUNNING);
 
@@ -119,6 +125,7 @@ Kernel::Initialize()
 
 Kernel::~Kernel()
 {
+    delete threadList;
     delete stats;
     delete interrupt;
     delete scheduler;
@@ -135,12 +142,63 @@ Kernel::~Kernel()
 }
 
 //----------------------------------------------------------------------
-// Kernel::ThreadSelfTest
-//      Test threads, semaphores, synchlists
+// Kernel::TS
+// 	    Print threads info
 //----------------------------------------------------------------------
 
 void
+Kernel::TS()
+{
+    for(ListIterator<Thread*> *iter = new ListIterator<Thread*>(kernel->threadList); !iter->IsDone(); iter->Next())
+    {
+        cout << "threadId : " << iter->Item()->getThreadId() 
+            << ", threadName : " << iter->Item()->getName()
+            << ", userId : " << iter->Item()->getUserId()
+            << ", priority : " << iter->Item()->getPriority();
+        switch(iter->Item()->getStatus()) {
+            case 0: cout << ", status : JUST_CREATED" << endl; break;
+            case 1: cout << ", status : READY" << endl; break;
+            case 2: cout << ", status : RUNNING" << endl; break;
+            case 3: cout << ", status : BLOCKED" << endl; break;
+            default: ASSERT(false);
+        }
+    }
+}
+//----------------------------------------------------------------------
+// Kernel::AllocateThreadId
+// 	    allocate thread id from thread pool. if maxThreadNum is reached, return -1
+//----------------------------------------------------------------------
+int
+Kernel::AllocateThreadId()
+{
+    threadNum++;
+    for (int i = 0; i < maxThreadNum; i++) {
+        if (!threadPool[i]) {
+            threadPool[i] = true;
+            return i;
+        }
+    }
+    return -1;
+}
+
+//----------------------------------------------------------------------
+// Kernel::AllocateThreadId
+// 	    allocate thread id from thread pool. if maxThreadNum is reached, return -1
+//----------------------------------------------------------------------
+void
+Kernel::DeallocateThreadId(int tid)
+{
+    threadNum--;
+    threadPool[tid] = false;
+}
+
+//----------------------------------------------------------------------
+// Kernel::ThreadSelfTest
+//      Test threads, semaphores, synchlists
+//----------------------------------------------------------------------
+void
 Kernel::ThreadSelfTest() {
+///*
    Semaphore *semaphore;
    SynchList<int> *synchList;
    
@@ -158,6 +216,8 @@ Kernel::ThreadSelfTest() {
    synchList = new SynchList<int>;
    synchList->SelfTest(9);
    delete synchList;
+//*/
+//   currentThread->SelfTest(); // test thread switching
 
 }
 

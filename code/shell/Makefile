@@ -1,5 +1,5 @@
 CC = gcc
-LD = gcc
+LD = gcc -Wl,--copy-dt-needed-entries
 CFLAGS = -g -O2 -DHAVE_CONFIG_H -I.
 
 all: shell

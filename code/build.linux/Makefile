@@ -200,7 +200,7 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX -DTUT
 # break the thread system.  You might want to use -fno-inline if
 # you need to call some inline functions from the debugger.
 
-CFLAGS = -ftemplate-depth-100 -Wno-deprecated -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -fpermissive -m32
+CFLAGS = -ftemplate-depth-100 -Wno-deprecated -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -fpermissive -m32 -w
 LDFLAGS = -m32
 
 #####################################################################

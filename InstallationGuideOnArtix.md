@@ -29,7 +29,10 @@ To make gcc compile 32bit program on x64 architecture, we need gcc-multilib. Arc
 make a directory for your manually built package and cd into it. type:
 > `git clone https://aur.archlinux.org/gcc49-multilib.git`  
 `cd gcc49-multilib`  
-`makepkg -si`
+`makepkg -si`  
+
+if the building process takes too long, you can get all your cores working. Firstly fetch how many cores you have by `cat /proc/cpuinfo`. Then edit /etc/makepkg.conf, changing `MAKEFLAGS="-j1"` at line 45 to `MAKEFLAGS="-j{your core num}`
+
 
 - use aur-helper  
 if you have one of the aur-helpers installed, taking yay for instance, you can simply type:

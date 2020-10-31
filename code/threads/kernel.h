@@ -59,6 +59,14 @@ class Kernel {
 
     int hostName;               // machine identifier
 
+    int threadNum;
+    int maxThreadNum;
+    bool *threadPool;           // whether the thread id is used
+    List<Thread*> *threadList;  
+    void TS();                  // print threads info
+    int AllocateThreadId();     // allocate an unused thread id from thread pool
+    void DeallocateThreadId(int tid);  // deallocated thread id and set correspond value in thread pool to false
+
   private:
     bool randomSlice;		// enable pseudo-random time slicing
     bool debugUserProg;         // single step user program

@@ -21,6 +21,7 @@
 #include "switch.h"
 #include "synch.h"
 #include "sysdep.h"
+#include <unistd.h> // import POSIX API, for getuid() solely
 
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
@@ -33,7 +34,7 @@ const int STACK_FENCEPOST = 0xdedbeef;
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
-Thread::Thread(char* threadName)
+Thread::Thread(char* threadName, int prio)
 {
     name = threadName;
     stackTop = NULL;
@@ -45,6 +46,20 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+
+    userId = getuid(); // from POSIX API
+    threadId = kernel->AllocateThreadId();
+    if (threadId == -1) {
+        DEBUG(dbgThread, "No unused thread id left. ASSERT");
+        ASSERT(false);
+    }
+    DEBUG(dbgThread, "Creating new thread with id:" << threadId << ". Curent threadNum: " << kernel->threadNum);
+    if (prio < 0 || prio > 255) {
+        priority = 128; // use default instead
+    } else {
+        priority = prio;
+    }
+    kernel->threadList->Append(this);
 }
 
 //----------------------------------------------------------------------
@@ -65,7 +80,10 @@ Thread::~Thread()
 
     ASSERT(this != kernel->currentThread);
     if (stack != NULL)
-	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
+        DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
+
+    kernel->DeallocateThreadId(threadId);
+    kernel->threadList->Remove(this);
 }
 
 //----------------------------------------------------------------------
@@ -206,12 +224,13 @@ Thread::Yield ()
     
     ASSERT(this == kernel->currentThread);
     
-    DEBUG(dbgThread, "Yielding thread: " << name);
+    DEBUG(dbgThread, "Yielding thread: " << name << ". readyList size: " << kernel->scheduler->getReadyList()->NumInList());
     
-    nextThread = kernel->scheduler->FindNextToRun();
+    nextThread = kernel->scheduler->FindNextToRun(false);
     if (nextThread != NULL) {
-	kernel->scheduler->ReadyToRun(this);
-	kernel->scheduler->Run(nextThread, FALSE);
+        kernel->scheduler->getReadyList()->RemoveFront();
+        kernel->scheduler->ReadyToRun(this);
+        kernel->scheduler->Run(nextThread, FALSE);
     }
     (void) kernel->interrupt->SetLevel(oldLevel);
 }
@@ -244,13 +263,14 @@ Thread::Sleep (bool finishing)
     ASSERT(this == kernel->currentThread);
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     
-    DEBUG(dbgThread, "Sleeping thread: " << name);
+    DEBUG(dbgThread, "Sleeping thread: " << name << ". readyList size: " << kernel->scheduler->getReadyList()->NumInList());
 
     status = BLOCKED;
-    while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL)
+    while ((nextThread = kernel->scheduler->FindNextToRun(true)) == NULL)
 	kernel->interrupt->Idle();	// no one to run, wait for an interrupt
     
     // returns when it's time for us to run
+    kernel->scheduler->getReadyList()->RemoveFront();
     kernel->scheduler->Run(nextThread, finishing); 
 }
 
@@ -395,7 +415,6 @@ Thread::RestoreUserState()
 	kernel->machine->WriteRegister(i, userRegisters[i]);
 }
 
-
 //----------------------------------------------------------------------
 // SimpleThread
 // 	Loop 5 times, yielding the CPU to another ready thread 
@@ -417,6 +436,50 @@ SimpleThread(int which)
 }
 
 //----------------------------------------------------------------------
+// Thread::MaxThreadNumTest
+// 	test whether the maxThreadNum limit works
+//----------------------------------------------------------------------
+void
+Thread::MaxThreadNumTest() 
+{
+    DEBUG(dbgThread, "Entering Thread::MaxThreadNumTest");
+    Thread** t = new Thread*[130];
+    for (int i = 0; i < 130; i++) {
+        t[i] = new Thread("forked thread");
+    }
+    //kernel->TS();
+}
+
+//----------------------------------------------------------------------
+// Thread::PreemptivePrioritySchedulingTest
+// 	test whether the preemptive priority scheduling works
+//----------------------------------------------------------------------
+void
+Thread::PreemptivePrioritySchedulingTest() 
+{
+    Thread *t1 = new Thread("forked thread", 127);
+    Thread *t2 = new Thread("forked thread", 126);
+    Thread *t3 = new Thread("forked thread", 125);
+
+    t1->Fork((VoidFunctionPtr) SimpleThread, (void *) t1->getThreadId());
+    t2->Fork((VoidFunctionPtr) SimpleThread, (void *) t2->getThreadId());
+    t3->Fork((VoidFunctionPtr) SimpleThread, (void *) t3->getThreadId());
+    kernel->TS();
+    kernel->currentThread->Yield();
+    kernel->TS();
+}
+
+//----------------------------------------------------------------------
+// Thread::TimeSlicingSchedulingTest
+// 	test whether the time slices scheduling works
+//----------------------------------------------------------------------
+void
+Thread::TimeSlicingSchedulingTest() 
+{
+    
+}
+
+//----------------------------------------------------------------------
 // Thread::SelfTest
 // 	Set up a ping-pong between two threads, by forking a thread 
 //	to call SimpleThread, and then calling SimpleThread ourselves.
@@ -425,12 +488,25 @@ SimpleThread(int which)
 void
 Thread::SelfTest()
 {
-    DEBUG(dbgThread, "Entering Thread::SelfTest");
 
+    DEBUG(dbgThread, "Entering Thread::SelfTest");
+    
+    //for max thread num test
+    //MaxThreadNumTest();
+
+    //for preemptive priority scheduling test
+    PreemptivePrioritySchedulingTest();
+    
+    //for time slicing scheduling test
+    //TimeSlicingSchedulingTest();
+
+/* for TS test
     Thread *t = new Thread("forked thread");
 
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
+    t->Fork((VoidFunctionPtr) SimpleThread, (void *) t->getThreadId());
     kernel->currentThread->Yield();
-    SimpleThread(0);
-}
+    SimpleThread(threadId);
+    kernel->TS();
+*/
 
+}

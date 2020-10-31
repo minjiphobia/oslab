@@ -2369,7 +2369,11 @@ thread.o: ../threads/thread.cc /usr/include/stdc-predef.h \
  ../lib/utility.h ../lib/sysdep.h ../lib/list.cc ../threads/main.h \
  ../lib/debug.h ../threads/kernel.h ../threads/scheduler.h \
  ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/callback.h ../machine/timer.h
+ ../threads/alarm.h ../machine/callback.h ../machine/timer.h \
+ /usr/include/unistd.h /usr/include/bits/posix_opt.h \
+ /usr/include/bits/environments.h /usr/include/bits/confname.h \
+ /usr/include/bits/getopt_posix.h /usr/include/bits/getopt_core.h \
+ /usr/include/bits/unistd_ext.h
 addrspace.o: ../userprog/addrspace.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../threads/main.h ../lib/debug.h ../lib/copyright.h \
  ../lib/utility.h ../lib/sysdep.h \

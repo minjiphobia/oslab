@@ -31,7 +31,7 @@
 
 Scheduler::Scheduler()
 { 
-    readyList = new List<Thread *>; 
+    readyList = new SortedList<Thread *>(ThreadPriorityCompare); 
     toBeDestroyed = NULL;
 } 
 
@@ -60,7 +60,7 @@ Scheduler::ReadyToRun (Thread *thread)
     DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
 
     thread->setStatus(READY);
-    readyList->Append(thread);
+    readyList->Insert(thread);
 }
 
 //----------------------------------------------------------------------
@@ -72,15 +72,23 @@ Scheduler::ReadyToRun (Thread *thread)
 //----------------------------------------------------------------------
 
 Thread *
-Scheduler::FindNextToRun ()
+Scheduler::FindNextToRun(bool sleep)
 {
-    ASSERT(kernel->interrupt->getLevel() == IntOff);
 
-    if (readyList->IsEmpty()) {
-	return NULL;
-    } else {
-    	return readyList->RemoveFront();
+    ASSERT(kernel->interrupt->getLevel() == IntOff);
+    
+// preemptive priority scheduling
+    if (sleep) { // current thread is about to sleep, return next thread 
+        return readyList->Front();
     }
+    if (readyList->IsEmpty()) {
+        return NULL;
+    } 
+    Thread* nextThread = readyList->Front();
+    if (nextThread->getPriority() < kernel->currentThread->getPriority()) {
+        return nextThread;
+    }
+    return NULL;
 }
 
 //----------------------------------------------------------------------

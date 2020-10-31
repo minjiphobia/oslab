@@ -201,58 +201,58 @@ main(int argc, char **argv)
 	    ASSERT(i + 1 < argc);   // next argument is debug string
             debugArg = argv[i + 1];
 	    i++;
-	}
-	else if (strcmp(argv[i], "-z") == 0) {
+        }
+        else if (strcmp(argv[i], "-z") == 0) {
             cout << copyright << "\n";
-	}
-	else if (strcmp(argv[i], "-x") == 0) {
-	    ASSERT(i + 1 < argc);
-	    userProgName = argv[i + 1];
-	    i++;
-	}
-	else if (strcmp(argv[i], "-K") == 0) {
-	    threadTestFlag = TRUE;
-	}
-	else if (strcmp(argv[i], "-C") == 0) {
-	    consoleTestFlag = TRUE;
-	}
-	else if (strcmp(argv[i], "-N") == 0) {
-	    networkTestFlag = TRUE;
-	}
+        }
+        else if (strcmp(argv[i], "-x") == 0) {
+            ASSERT(i + 1 < argc);
+            userProgName = argv[i + 1];
+            i++;
+        }
+        else if (strcmp(argv[i], "-K") == 0) {
+            threadTestFlag = TRUE;
+        }
+        else if (strcmp(argv[i], "-C") == 0) {
+            consoleTestFlag = TRUE;
+        }
+        else if (strcmp(argv[i], "-N") == 0) {
+            networkTestFlag = TRUE;
+        }
 #ifndef FILESYS_STUB
-	else if (strcmp(argv[i], "-cp") == 0) {
-	    ASSERT(i + 2 < argc);
-	    copyUnixFileName = argv[i + 1];
-	    copyNachosFileName = argv[i + 2];
-	    i += 2;
-	}
-	else if (strcmp(argv[i], "-p") == 0) {
-	    ASSERT(i + 1 < argc);
-	    printFileName = argv[i + 1];
-	    i++;
-	}
-	else if (strcmp(argv[i], "-r") == 0) {
-	    ASSERT(i + 1 < argc);
-	    removeFileName = argv[i + 1];
-	    i++;
-	}
-	else if (strcmp(argv[i], "-l") == 0) {
-	    dirListFlag = true;
-	}
-	else if (strcmp(argv[i], "-D") == 0) {
-	    dumpFlag = true;
-	}
+        else if (strcmp(argv[i], "-cp") == 0) {
+            ASSERT(i + 2 < argc);
+            copyUnixFileName = argv[i + 1];
+            copyNachosFileName = argv[i + 2];
+            i += 2;
+        }
+        else if (strcmp(argv[i], "-p") == 0) {
+            ASSERT(i + 1 < argc);
+            printFileName = argv[i + 1];
+            i++;
+        }
+        else if (strcmp(argv[i], "-r") == 0) {
+            ASSERT(i + 1 < argc);
+            removeFileName = argv[i + 1];
+            i++;
+        }
+        else if (strcmp(argv[i], "-l") == 0) {
+            dirListFlag = true;
+        }
+        else if (strcmp(argv[i], "-D") == 0) {
+            dumpFlag = true;
+        }
 #endif //FILESYS_STUB
-	else if (strcmp(argv[i], "-u") == 0) {
+        else if (strcmp(argv[i], "-u") == 0) {
             cout << "Partial usage: nachos [-z -d debugFlags]\n";
             cout << "Partial usage: nachos [-x programName]\n";
-	    cout << "Partial usage: nachos [-K] [-C] [-N]\n";
+            cout << "Partial usage: nachos [-K] [-C] [-N]\n";
 #ifndef FILESYS_STUB
             cout << "Partial usage: nachos [-cp UnixFile NachosFile]\n";
             cout << "Partial usage: nachos [-p fileName] [-r fileName]\n";
             cout << "Partial usage: nachos [-l] [-D]\n";
 #endif //FILESYS_STUB
-	}
+        }
 
     }
     debug = new Debug(debugArg);
@@ -274,13 +274,13 @@ main(int argc, char **argv)
     // at this point, the kernel is ready to do something
     // run some tests, if requested
     if (threadTestFlag) {
-      kernel->ThreadSelfTest();  // test threads and synchronization
+        kernel->ThreadSelfTest();  // test threads and synchronization
     }
     if (consoleTestFlag) {
-      kernel->ConsoleTest();   // interactive test of the synchronized console
+        kernel->ConsoleTest();   // interactive test of the synchronized console
     }
     if (networkTestFlag) {
-      kernel->NetworkTest();   // two-machine test of the network
+        kernel->NetworkTest();   // two-machine test of the network
     }
 
 #ifndef FILESYS_STUB
