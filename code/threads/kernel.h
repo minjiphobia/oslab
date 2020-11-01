@@ -35,7 +35,7 @@ class Kernel {
 				// from constructor because 
 				// refers to "kernel" as a global
 
-    void ThreadSelfTest();	// self test of threads and synchronization
+    void ThreadSelfTest(int flag);	// self test of threads and synchronization
 
     void ConsoleTest();         // interactive console self test
 

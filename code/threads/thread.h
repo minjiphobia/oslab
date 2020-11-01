@@ -104,7 +104,7 @@ class Thread {
     ThreadStatus getStatus() { return status; }
     char* getName() { return (name); }
     void Print() { cout << name; }
-    void SelfTest();		// test whether thread impl is working
+    void SelfTest(int flag);		// test whether thread impl is working
 
   private:
     // some of the private data for this class is listed above

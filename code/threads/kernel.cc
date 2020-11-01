@@ -197,14 +197,14 @@ Kernel::DeallocateThreadId(int tid)
 //      Test threads, semaphores, synchlists
 //----------------------------------------------------------------------
 void
-Kernel::ThreadSelfTest() {
+Kernel::ThreadSelfTest(int flag) {
 ///*
    Semaphore *semaphore;
    SynchList<int> *synchList;
    
    LibSelfTest();		// test library routines
    
-   currentThread->SelfTest();	// test thread switching
+   currentThread->SelfTest(flag);	// test thread switching
    
    				// test semaphore operation
    semaphore = new Semaphore("test", 0);

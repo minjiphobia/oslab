@@ -71,7 +71,7 @@ void Thread::MaxThreadNumTest()
 ```
 测试结果见下
 ```
-➜  build.linux git:(master) ✗ ./nachos -K -d t
+➜  build.linux git:(master) ✗ ./nachos -K2 -d t
 Entering main
 
 
@@ -112,25 +112,15 @@ void Kernel::TS()
     }
 }
 ```
-在SelfTest()中最后调用TS()，结果见下
+新建一个线程并调用TS()，结果见下
 ```
-➜  build.linux git:(master) ✗ ./nachos -K
+➜  build.linux git:(master) ✗ ./nachos -K1
 
 
 tests summary: ok:0
-*** thread 2 looped 0 times
-*** thread 0 looped 0 times
-*** thread 2 looped 1 times
-*** thread 0 looped 1 times
-*** thread 2 looped 2 times
-*** thread 0 looped 2 times
-*** thread 0 looped 3 times
-*** thread 2 looped 3 times
-*** thread 0 looped 4 times
-*** thread 2 looped 4 times
 threadId : 0, threadName : main, userId : 1000, priority : 128, status : READY
-threadId : 1, threadName : postal worker, userId : 1000, priority : 128, status : BLOCKED
-threadId : 2, threadName : forked thread, userId : 1000, priority : 128, status : RUNNING
+threadId : 1, threadName : postal worker, userId : 1000, priority : 128, status : RUNNING
+threadId : 2, threadName : forked thread, userId : 1000, priority : 128, status : JUST_CREATED
 Machine halting!
 ```
 ## Exercise 4  源代码阅读 
@@ -195,7 +185,7 @@ void Thread::PreemptivePrioritySchedulingTest()
 ```
 在SelfTest()中调用测试函数，结果见下
 ```
-➜  build.linux git:(master) ✗ ./nachos -K
+➜  build.linux git:(master) ✗ ./nachos -K3
 
 
 tests summary: ok:0
@@ -225,6 +215,11 @@ Machine halting!
 ```
 优先级更高的线程优先运行，与期望符合
 ## \*Challenge  线程调度算法扩展
-实现时间片轮转算法.  
+实现时间片轮转算法. (未完成）
 
+## \*To be completed
+- 时间片轮转算法未完成
 
+- 在执行一些关于线程的功能时还会报segment fault，没有全部改完  
+
+- 代码逻辑很乱，需要整理

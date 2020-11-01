@@ -429,6 +429,7 @@ SimpleThread(int which)
 {
     int num;
     
+    //  loop times changed to 20 for TimerSlicingSchedulingTest()
     for (num = 0; num < 5; num++) {
 	cout << "*** thread " << which << " looped " << num << " times\n";
         kernel->currentThread->Yield();
@@ -476,7 +477,15 @@ Thread::PreemptivePrioritySchedulingTest()
 void
 Thread::TimeSlicingSchedulingTest() 
 {
-    
+    Thread *t1 = new Thread("forked thread");
+    Thread *t2 = new Thread("forked thread");
+    Thread *t3 = new Thread("forked thread");
+
+    t1->Fork((VoidFunctionPtr) SimpleThread, (void *) t1->getThreadId());
+    t2->Fork((VoidFunctionPtr) SimpleThread, (void *) t2->getThreadId());
+    t3->Fork((VoidFunctionPtr) SimpleThread, (void *) t3->getThreadId());
+    kernel->currentThread->Yield();
+    kernel->TS();
 }
 
 //----------------------------------------------------------------------
@@ -486,27 +495,35 @@ Thread::TimeSlicingSchedulingTest()
 //----------------------------------------------------------------------
 
 void
-Thread::SelfTest()
+Thread::SelfTest(int flag)
 {
 
     DEBUG(dbgThread, "Entering Thread::SelfTest");
     
-    //for max thread num test
-    //MaxThreadNumTest();
+    switch(flag) {
+        case 1: {
+            //default
+            Thread *t = new Thread("forked thread");
 
-    //for preemptive priority scheduling test
-    PreemptivePrioritySchedulingTest();
-    
-    //for time slicing scheduling test
-    //TimeSlicingSchedulingTest();
-
-/* for TS test
-    Thread *t = new Thread("forked thread");
-
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) t->getThreadId());
-    kernel->currentThread->Yield();
-    SimpleThread(threadId);
-    kernel->TS();
-*/
-
+            //t->Fork((VoidFunctionPtr) SimpleThread, (void *) t->getThreadId());
+            //kernel->currentThread->Yield();
+            //SimpleThread(threadId);
+            kernel->TS();
+            break;
+        }
+        case 2:
+            //for max thread num test
+            MaxThreadNumTest();
+            break;
+        case 3:
+            //for preemptive priority scheduling test
+            PreemptivePrioritySchedulingTest();
+            break;
+        case 4:
+            //for time slicing scheduling test
+            TimeSlicingSchedulingTest();
+            break;
+        default:
+            ASSERT(false);
+    }
 }

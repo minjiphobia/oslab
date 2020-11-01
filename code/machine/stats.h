@@ -56,5 +56,4 @@ const int SeekTime =	 500;  	// time disk takes to seek past one track
 const int ConsoleTime =	 100;	// time to read or write one character
 const int NetworkTime =	 100;  	// time to send or receive one packet
 const int TimerTicks = 	 100;  	// (average) time between timer interrupts
-
 #endif // STATS_H

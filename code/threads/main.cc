@@ -181,7 +181,7 @@ main(int argc, char **argv)
     int i;
     char *debugArg = "";
     char *userProgName = NULL;        // default is not to execute a user prog
-    bool threadTestFlag = false;
+    int threadTestFlag = 0;
     bool consoleTestFlag = false;
     bool networkTestFlag = false;
 #ifndef FILESYS_STUB
@@ -210,8 +210,17 @@ main(int argc, char **argv)
             userProgName = argv[i + 1];
             i++;
         }
-        else if (strcmp(argv[i], "-K") == 0) {
-            threadTestFlag = TRUE;
+        else if (strcmp(argv[i], "-K" )== 0 || strcmp(argv[i], "-K1") == 0) {
+            threadTestFlag = 1;
+        }
+        else if (strcmp(argv[i], "-K2") == 0) {
+            threadTestFlag = 2;
+        }
+        else if (strcmp(argv[i], "-K3") == 0) {
+            threadTestFlag = 3;
+        }
+        else if (strcmp(argv[i], "-K4") == 0) {
+            threadTestFlag = 4;
         }
         else if (strcmp(argv[i], "-C") == 0) {
             consoleTestFlag = TRUE;
@@ -274,7 +283,7 @@ main(int argc, char **argv)
     // at this point, the kernel is ready to do something
     // run some tests, if requested
     if (threadTestFlag) {
-        kernel->ThreadSelfTest();  // test threads and synchronization
+        kernel->ThreadSelfTest(threadTestFlag);  // test threads and synchronization
     }
     if (consoleTestFlag) {
         kernel->ConsoleTest();   // interactive test of the synchronized console
